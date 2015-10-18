@@ -134,6 +134,17 @@
    :db/fn    @f-var})
 
 
+(defn prefixname-to-iri
+  "Returns the prefix names and prefix IRI's as a map of prefixname to iri."
+  [db]
+  (into {} (d/q '[:find ?a ?i :where [?e :uri/prefixName ?a] [?e :uri/prefixIRI ?i]] db)))
+
+(defn iri-to-prefixname
+  "Returns the prefix names and prefix IRI's as a map of iri to name."
+  [db]
+  (into {} (d/q '[:find ?i ?a :where [?e :uri/prefixName ?a] [?e :uri/prefixIRI ?i]] db)))
+
+
 (defn insert-schema [conn schema]
   @(d/transact conn (map as-attr schema)))
 
