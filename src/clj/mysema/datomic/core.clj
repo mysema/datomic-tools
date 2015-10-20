@@ -174,20 +174,20 @@
 ;                            [])})
 ;    {:doc (str "Associates current ref id for the given reference value map")}))
 
-;(def replace-entities
-;  (with-meta
-;    (d/function '{:lang   :clojure
-;                  :params [db e a v]
-;                  :code   (if-not v                         ;; for nil value do nothing
-;                            []
-;                            (concat
-;                              (for [datom (d/datoms db :eavt e a)]
-;                                [:db.fn/retractEntity (:v datom)])
-;                              (if-not (empty? v)
-;                                [{:db/id e
-;                                  a      v}]
-;                                [])))})
-;    {:doc (str "Returns retract data for the entities given attribute refers to and adds given values.")}))
+(def replace-entities
+  (with-meta
+    (d/function '{:lang   :clojure
+                  :params [db e a v]
+                  :code   (if-not v                         ;; for nil value do nothing
+                            []
+                            (concat
+                              (for [datom (d/datoms db :eavt e a)]
+                                [:db.fn/retractEntity (:v datom)])
+                              (if-not (empty? v)
+                                [{:db/id e
+                                  a      v}]
+                                [])))})
+    {:doc (str "Returns retract data for the entities given attribute refers to and adds given values.")}))
 
 (def replace-refs
   (with-meta
@@ -257,7 +257,7 @@
 
 (defn insert-functions [conn]
   @(d/transact conn (map as-db-function [;#'upsert-refs
-                                         ;#'replace-entities
+                                         #'replace-entities
                                          #'replace-refs
                                          #'replace-values
                                          ;#'replace-all
