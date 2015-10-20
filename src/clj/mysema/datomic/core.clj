@@ -177,14 +177,14 @@
 (def replace-entities
   (with-meta
     (d/function '{:lang   :clojure
-                  :params [db e a v]
+                  :params [db tempid e a v]
                   :code   (if-not v                         ;; for nil value do nothing
                             []
                             (concat
                               (for [datom (d/datoms db :eavt e a)]
                                 [:db.fn/retractEntity (:v datom)])
                               (if-not (empty? v)
-                                [{:db/id e
+                                [{:db/id (or tempid e)
                                   a      v}]
                                 [])))})
     {:doc (str "Returns retract data for the entities given attribute refers to and adds given values.")}))
