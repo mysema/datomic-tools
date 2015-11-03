@@ -227,13 +227,18 @@
                                 vals-to-remove (when eid
                                                  (clojure.set/difference
                                                    (set (map :v (d/datoms db :eavt eid a)))
-                                                   (set v)))
+                                                   ;; Allow v to be either single value or multivalue
+                                                   ;; v inside transactor is ArrayList!
+                                                   (set (if (instance? java.lang.Iterable v)
+                                                          v
+                                                          [v]))))
                                 ;; for inserting values either use tempid
                                 ;; or if tempid is null real entityid, which can be null
                                 ;; and will throw exception from tx
                                 new-vals (if v
                                            [{:db/id (or tempid eid) a v}]
-                                           [])]             ;; nil v will just empty all values
+                                           [])
+                                ]             ;; nil v will just empty all values
                             (if eid
                               (concat new-vals
                                       (map (fn [v] [:db/retract eid a v]) vals-to-remove))
