@@ -181,8 +181,12 @@
                   :code   (if-not v                         ;; for nil value do nothing
                             []
                             (concat
-                              (for [datom (d/datoms db :eavt e a)]
-                                [:db.fn/retractEntity (:v datom)])
+                              ;; Handle inverse property
+                              (let [[index a datom-k] (if (.startsWith (name a) "_")
+                                                [:vaet (keyword (namespace a) (subs (name a) 1)) :e]
+                                                [:eavt a :v])]
+                                (for [datom (d/datoms db index e a)]
+                                  [:db.fn/retractEntity (datom-k datom)]))
                               (if-not (empty? v)
                                 [{:db/id (or tempid e)
                                   a      v}]
@@ -219,21 +223,21 @@
   (with-meta
     (d/function '{:lang   :clojure
                   :params [db tempid e a v]
-                  :code   (if-not v
-                            []
-                            (let [eid (:db/id (d/entity db e)) ;; handles lookup-ref
-                                  vals-to-remove (when eid
-                                                   (clojure.set/difference
-                                                     (set (map :v (d/datoms db :eavt eid a)))
-                                                     (set v)))
-                                  ;; for inserting values either use tempid
-                                  ;; or if tempid is null real entityid, which can be null
-                                  ;; and will throw exception from tx
-                                  new-vals [{:db/id (or tempid eid) a v}]]
-                              (if eid
-                                (concat new-vals
-                                        (map (fn [v] [:db/retract eid a v]) vals-to-remove))
-                                new-vals)))})
+                  :code   (let [eid (:db/id (d/entity db e)) ;; handles lookup-ref
+                                vals-to-remove (when eid
+                                                 (clojure.set/difference
+                                                   (set (map :v (d/datoms db :eavt eid a)))
+                                                   (set v)))
+                                ;; for inserting values either use tempid
+                                ;; or if tempid is null real entityid, which can be null
+                                ;; and will throw exception from tx
+                                new-vals (if v
+                                           [{:db/id (or tempid eid) a v}]
+                                           [])]             ;; nil v will just empty all values
+                            (if eid
+                              (concat new-vals
+                                      (map (fn [v] [:db/retract eid a v]) vals-to-remove))
+                              new-vals))})
     {:doc "Removes all attribute values and replaces it with given values."}))
 
 ;(def replace-all
