@@ -193,6 +193,20 @@
                                 [])))})
     {:doc (str "Returns retract data for the entities given attribute refers to and adds given values.")}))
 
+
+(def remove-entities
+  (with-meta
+    (d/function '{:lang   :clojure
+                  :params [db tempid e a]
+                  :code   (let [[index a datom-k] (if (.startsWith (name a) "_")
+                                                    [:vaet (keyword (namespace a) (subs (name a) 1)) :e]
+                                                    [:eavt a :v])]
+                            (for [datom (d/datoms db index e a)]
+                              [:db.fn/retractEntity (datom-k datom)]))})
+    {:doc (str "Returns retract data for the entities given attribute refers currently.")}))
+
+
+
 (def replace-refs
   (with-meta
     (d/function
@@ -267,6 +281,7 @@
 (defn insert-functions [conn]
   @(d/transact conn (map as-db-function [;#'upsert-refs
                                          #'replace-entities
+                                         #'remove-entities
                                          #'replace-refs
                                          #'replace-values
                                          ;#'replace-all

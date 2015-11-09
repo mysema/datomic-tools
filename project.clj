@@ -1,4 +1,4 @@
-(defproject mysema/datomic-tools "0.1.2"
+(defproject mysema/datomic-tools "0.1.3"
   :description "Mysema Datomic tools"
   :url "http://mysema.com"
   :license {:name "Eclipse Public License"
