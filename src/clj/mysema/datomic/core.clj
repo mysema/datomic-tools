@@ -87,11 +87,18 @@
    (when s
      (let [cut-point (- (.length s) 3)]
        (when (>= cut-point 0)
-         [(let [lang (.substring s (+ cut-point 1))]
-            (if (= lang "__")
-              missing-lang
-              lang))
-          (.substring s 0 cut-point)])))))
+         (let [lang (.substring s cut-point)]
+           (cond
+             (not (.startsWith lang "@")) [missing-lang s]
+             (= lang "@__") [missing-lang (.substring s 0 cut-point)]
+             :else [(.substring lang 1) (.substring s 0 cut-point)])
+
+           ))))))
+         ;[(let [lang (.substring s (+ cut-point 1))]
+         ;   (if (= lang "__")
+         ;     missing-lang
+         ;     lang))
+         ; (.substring s 0 cut-point)])))))
 
 (defn as-lang-strings
   "Returns given map {lang str} as collection of str's

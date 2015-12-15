@@ -198,21 +198,28 @@
 ;  (assert-qry member-refs ["p1"])
 ;  )
 ;
-;(defmacro assert-lang-val
-;  [s lang]
-;  `(let [[rlang# rs#] (dt/from-lang-str (dt/to-lang-str ~lang ~s))]
-;     (is (= (= ~s rs#)) "String is not same")
-;     (is (= ~lang rlang#) "Lang is not same")))
-;
-;(deftest lang-strings
-;
-;  (assert-lang-val "a" "fi")
-;  (assert-lang-val "a" nil)
-;  (assert-lang-val nil nil)
-;  (assert-lang-val "" "fi")
-;  (assert-lang-val "" nil)
-;
-;  )
+(defmacro assert-lang-val
+  [s lang]
+  `(let [[rlang# rs#] (dt/from-lang-str (dt/to-lang-str ~lang ~s))]
+     (is (= (= ~s rs#)) "String is not same")
+     (is (= ~lang rlang#) "Lang is not same")))
+
+(deftest lang-strings
+
+  (assert-lang-val "a" "fi")
+  (assert-lang-val "a" nil)
+  (assert-lang-val nil nil)
+  (assert-lang-val "" "fi")
+  (assert-lang-val "" nil)
+  (assert-lang-val "longerstring" nil)
+
+  (is (= [nil "string"] (dt/from-lang-str "string@__")))
+  (is (= ["fi" "string"] (dt/from-lang-str "fi" "string@__")))
+  (is (= ["fi" "string"] (dt/from-lang-str "string@fi")))
+  (is (= [nil "string"] (dt/from-lang-str "string")))
+  (is (= ["fi" "string"] (dt/from-lang-str "fi" "string")))
+
+  )
 
 
 ;; Not sure is this needed at all
