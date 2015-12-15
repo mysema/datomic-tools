@@ -1,6 +1,6 @@
 # Mysema Datomic tools
 
-Collection of Datomic tools
+Collection of Datomic tools, which all are in very preliminary state as we are just learning how to work with Datomic.
 
 TODO rest 
 
